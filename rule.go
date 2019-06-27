@@ -3,6 +3,7 @@ package Grouter
 import (
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 type Rule struct {
@@ -14,11 +15,35 @@ type Rule struct {
 }
 
 var (
+	// HTTPMETHOD list the supported http methods.
+	HTTPMETHOD = map[string]bool{
+		"GET":       true,
+		"POST":      true,
+		"PUT":       true,
+		"DELETE":    true,
+		"PATCH":     true,
+		"OPTIONS":   true,
+		"HEAD":      true,
+		"TRACE":     true,
+		"CONNECT":   true,
+		"MKCOL":     true,
+		"COPY":      true,
+		"MOVE":      true,
+		"PROPFIND":  true,
+		"PROPPATCH": true,
+		"LOCK":      true,
+		"UNLOCK":    true,
+	}
+
 	matcher = regexp.MustCompile("(?:@(.*?):)")
 )
 
 // create a new rule
 func NewRule(method string, path string, handler http.HandlerFunc) *Rule {
+	method = strings.ToUpper(method)
+	if !HTTPMETHOD[method] {
+		panic("invalid request method " + method)
+	}
 	rule := &Rule{
 		Method:  method,
 		Path:    path,
@@ -36,6 +61,5 @@ func NewRule(method string, path string, handler http.HandlerFunc) *Rule {
 		rule.Reg = path
 	}
 	rule.Params = params
-
 	return rule
 }
