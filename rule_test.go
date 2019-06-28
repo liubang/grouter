@@ -1,8 +1,11 @@
 package Grouter
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestNewRule(t *testing.T) {
 	rule := NewRule("POST", "/liubang/@name:([a-z]+)/@age:([0-9])", nil)
-	rule = rule
+	fmt.Println(rule.ParamKeys)
 }

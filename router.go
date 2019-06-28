@@ -1,22 +1,30 @@
 package Grouter
 
 import (
-	"fmt"
 	"net/http"
-	"regexp"
 	"strings"
 )
 
 type Router struct {
-	Rules     []*Rule
-	ChunkSize int
+	Rules    []*Rule
+	NotFound HandlerFunc
 }
 
-// 创建一个Router
-func NewRouter(chunkSize int) *Router {
-	return &Router{
-		ChunkSize: chunkSize,
+type HandlerFunc func(w http.ResponseWriter, r *http.Request, params map[string]string)
+
+var (
+	NotFound = func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+		http.NotFound(w, r)
 	}
+)
+
+// 创建一个Router
+func NewRouter() *Router {
+	return &Router{}
+}
+
+func (router *Router) SetNotFound(notFoundHandler HandlerFunc) {
+	router.NotFound = notFoundHandler
 }
 
 func (router *Router) AddRule(rule *Rule) {
@@ -52,24 +60,45 @@ func (router *Router) Head(path string, handler http.HandlerFunc) {
 	router.add("HEAD", path, handler)
 }
 
-func (router *Router) Lookup(method string, uri string) {
+func (router *Router) Lookup(method string, uri string) (*Rule, bool) {
 	method = strings.ToUpper(method)
-	preg := "(?:"
-	for idx, rule := range router.Rules {
+	for _, rule := range router.Rules {
 		if rule.Method == method {
-			preg += fmt.Sprintf("(?P<grouter_%d>%s)|", idx, rule.Reg)
+			if rule.matcher == nil {
+				// string match
+				if rule.Reg == uri {
+					return rule, true
+				}
+			} else {
+				matches := rule.matcher.FindStringSubmatch(uri)
+				if len(matches) == 0 {
+					continue
+				}
+				for idx, item := range matches {
+					if idx == 0 {
+						continue
+					}
+					rule.Params[rule.ParamKeys[idx-1]] = item
+				}
+
+				return rule, true
+			}
 		}
 	}
-	preg = strings.TrimRight(preg, "|")
-	preg += ")"
-	fmt.Println(preg)
-	matcher := regexp.MustCompile(preg)
-	matches := matcher.FindAllStringSubmatch(uri, -1)
-	groups := matcher.SubexpNames()
-	fmt.Println(groups)
-	fmt.Println(matches)
-	for idx, match := range matches {
-		fmt.Println(groups[idx])
-		fmt.Println(match)
+
+	return nil, false
+}
+
+// implements http.Handler interface.
+func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	rule, f := router.Lookup(r.Method, r.URL.Path)
+	if f {
+		rule.Handler(w, r, rule.Params)
+	} else {
+		if router.NotFound != nil {
+			router.NotFound(w, r, nil)
+		} else {
+			NotFound(w, r, nil)
+		}
 	}
 }
