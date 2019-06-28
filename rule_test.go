@@ -1,4 +1,4 @@
-package Grouter
+package grouter
 
 import (
 	"fmt"
