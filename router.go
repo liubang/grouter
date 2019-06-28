@@ -10,7 +10,7 @@ type Router struct {
 	NotFound HandlerFunc
 }
 
-type HandlerFunc func(w http.ResponseWriter, r *http.Request, params map[string]string)
+type HandlerFunc func(w http.ResponseWriter, r *http.Request, pathvariables map[string]string)
 
 var (
 	NotFound = func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
@@ -31,32 +31,32 @@ func (router *Router) AddRule(rule *Rule) {
 	router.Rules = append(router.Rules, rule)
 }
 
-func (router *Router) add(method string, path string, handler http.HandlerFunc) {
+func (router *Router) add(method string, path string, handler HandlerFunc) {
 	rule := NewRule(method, path, handler)
 	router.AddRule(rule)
 }
 
-func (router *Router) Get(path string, handler http.HandlerFunc) {
+func (router *Router) Get(path string, handler HandlerFunc) {
 	router.add("GET", path, handler)
 }
 
-func (router *Router) Put(path string, handler http.HandlerFunc) {
+func (router *Router) Put(path string, handler HandlerFunc) {
 	router.add("PUT", path, handler)
 }
 
-func (router *Router) Post(path string, handler http.HandlerFunc) {
+func (router *Router) Post(path string, handler HandlerFunc) {
 	router.add("POST", path, handler)
 }
 
-func (router *Router) Delete(path string, handler http.HandlerFunc) {
+func (router *Router) Delete(path string, handler HandlerFunc) {
 	router.add("DELETE", path, handler)
 }
 
-func (router *Router) Option(path string, handler http.HandlerFunc) {
+func (router *Router) Option(path string, handler HandlerFunc) {
 	router.add("OPTION", path, handler)
 }
 
-func (router *Router) Head(path string, handler http.HandlerFunc) {
+func (router *Router) Head(path string, handler HandlerFunc) {
 	router.add("HEAD", path, handler)
 }
 

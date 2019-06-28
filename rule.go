@@ -1,7 +1,6 @@
 package Grouter
 
 import (
-	"net/http"
 	"regexp"
 	"strings"
 )
@@ -41,7 +40,7 @@ var (
 )
 
 // create a new rule
-func NewRule(method string, path string, handler http.HandlerFunc) *Rule {
+func NewRule(method string, path string, handler HandlerFunc) *Rule {
 	method = strings.ToUpper(method)
 	if !HTTPMETHOD[method] {
 		panic("invalid request method " + method)
