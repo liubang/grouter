@@ -37,27 +37,31 @@ func (router *Router) add(method string, path string, handler HandlerFunc) {
 }
 
 func (router *Router) Get(path string, handler HandlerFunc) {
-	router.add("GET", path, handler)
+	router.add(http.MethodGet, path, handler)
 }
 
 func (router *Router) Put(path string, handler HandlerFunc) {
-	router.add("PUT", path, handler)
+	router.add(http.MethodPut, path, handler)
 }
 
 func (router *Router) Post(path string, handler HandlerFunc) {
-	router.add("POST", path, handler)
+	router.add(http.MethodPost, path, handler)
 }
 
 func (router *Router) Delete(path string, handler HandlerFunc) {
-	router.add("DELETE", path, handler)
+	router.add(http.MethodDelete, path, handler)
 }
 
 func (router *Router) Option(path string, handler HandlerFunc) {
-	router.add("OPTION", path, handler)
+	router.add(http.MethodOptions, path, handler)
 }
 
 func (router *Router) Head(path string, handler HandlerFunc) {
-	router.add("HEAD", path, handler)
+	router.add(http.MethodHead, path, handler)
+}
+
+func (router *Router) Connect(path string, handler HandlerFunc) {
+	router.add(http.MethodConnect, path, handler)
 }
 
 func (router *Router) Lookup(method string, uri string) (*Rule, bool) {
@@ -80,7 +84,6 @@ func (router *Router) Lookup(method string, uri string) (*Rule, bool) {
 					}
 					rule.Params[rule.ParamKeys[idx-1]] = item
 				}
-
 				return rule, true
 			}
 		}

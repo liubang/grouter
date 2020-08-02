@@ -1,8 +1,10 @@
 package grouter
 
 import (
-	"fmt"
+	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRouter_Lookup(t *testing.T) {
@@ -11,17 +13,12 @@ func TestRouter_Lookup(t *testing.T) {
 	router.Put("/bbb/@age:([0-9]+)", nil)
 	router.Get("/ccc/@name:([a-z]+)/@age:([0-9]+)", nil)
 	router.Delete("/this/is/test", nil)
-	rule, found := router.Lookup("GET", "/ccc/liubang/26")
-	if !found {
-		t.Error("查找路由失败")
-	} else {
-		fmt.Println(rule)
-	}
-
-	rule, found = router.Lookup("DELETE", "/this/is/test")
-	if !found {
-		t.Error("查找路由失败")
-	} else {
-		fmt.Println(rule)
-	}
+	rule, found := router.Lookup(http.MethodGet, "/ccc/liubang/26")
+	assert.Equal(t, true, found)
+	assert.Equal(t, "liubang", rule.Params["name"])
+	assert.Equal(t, "26", rule.Params["age"])
+	rule, found = router.Lookup(http.MethodDelete, "/this/is/test")
+	assert.Equal(t, true, found)
+	rule, found = router.Lookup(http.MethodPut, "/this/is/test")
+	assert.Equal(t, false, found)
 }
