@@ -1,5 +1,7 @@
 # Grouter
 
+![License: MIT](https://img.shields.io/github/license/liubang/grouter?style=flat-square)
+
 ```go
 router := grouter.NewRouter()
 router.Post("/job/save", api.HandleJobSave)
@@ -13,3 +15,4 @@ httpServer := &http.Server{
 
 ......
 ```
+
