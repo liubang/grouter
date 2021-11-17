@@ -17,8 +17,8 @@ func TestRouter_Lookup(t *testing.T) {
 	assert.Equal(t, true, found)
 	assert.Equal(t, "liubang", rule.Params["name"])
 	assert.Equal(t, "26", rule.Params["age"])
-	rule, found = router.Lookup(http.MethodDelete, "/this/is/test")
+	_, found = router.Lookup(http.MethodDelete, "/this/is/test")
 	assert.Equal(t, true, found)
-	rule, found = router.Lookup(http.MethodPut, "/this/is/test")
+	_, found = router.Lookup(http.MethodPut, "/this/is/test")
 	assert.Equal(t, false, found)
 }

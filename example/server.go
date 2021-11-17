@@ -1,36 +1,23 @@
 package main
 
 import (
-	"log"
 	"net/http"
-	"sync/atomic"
 
 	"github.com/iliubang/grouter"
 )
 
-var count uint64
-
-func init() {
-	atomic.StoreUint64(&count, 0)
+func index(w http.ResponseWriter, _ *http.Request, _ map[string]string) {
+	w.Header().Add("Content-Type", "application/json")
+	w.Write([]byte(`{"code": 0, "data": "hello world"}`))
 }
 
-func home(w http.ResponseWriter, r *http.Request, pathvariables map[string]string) {
-	atomic.AddUint64(&count, 1)
-	c := atomic.LoadUint64(&count)
-	log.Printf("count: %d\n", c)
-	if (c & 1) == 1 {
-		panic("hahaha")
-	} else {
-		w.Write([]byte("hello world"))
-	}
+func aaa(w http.ResponseWriter, _ *http.Request, params map[string]string) {
+	w.Write([]byte(params["name"]))
 }
 
 func main() {
-	router := grouter.NewRouter()
-	router.Get("/index.html", home)
-	httpServer := &http.Server{
-		Addr:    "127.0.0.1:8080",
-		Handler: router,
-	}
-	httpServer.ListenAndServe()
+	r := grouter.NewRouter()
+	r.Get("/index.html", index)
+	r.Get("/aaa/@name:([^/]+)", aaa)
+	http.ListenAndServe("127.0.0.1:8080", r)
 }
