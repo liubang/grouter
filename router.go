@@ -1,6 +1,7 @@
 package grouter
 
 import (
+	"context"
 	"net/http"
 	"strings"
 )
@@ -8,19 +9,20 @@ import (
 type Router struct {
 	Rules    []*Rule
 	NotFound HandlerFunc
+	ctx      context.Context
 }
 
-type HandlerFunc func(w http.ResponseWriter, r *http.Request, pathvariables map[string]string)
+type HandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, pathvariables map[string]string)
 
 var (
-	NotFound = func(w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	NotFound = func(_ context.Context, w http.ResponseWriter, r *http.Request, _ map[string]string) {
 		http.NotFound(w, r)
 	}
 )
 
 // 创建一个Router
-func NewRouter() *Router {
-	return &Router{}
+func NewRouter(ctx context.Context) *Router {
+	return &Router{ctx: ctx}
 }
 
 func (router *Router) SetNotFound(notFoundHandler HandlerFunc) {
@@ -96,12 +98,12 @@ func (router *Router) Lookup(method string, uri string) (*Rule, bool) {
 func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rule, f := router.Lookup(r.Method, r.URL.Path)
 	if f {
-		rule.Handler(w, r, rule.Params)
+		rule.Handler(router.ctx, w, r, rule.Params)
 	} else {
 		if router.NotFound != nil {
-			router.NotFound(w, r, nil)
+			router.NotFound(router.ctx, w, r, nil)
 		} else {
-			NotFound(w, r, nil)
+			NotFound(router.ctx, w, r, nil)
 		}
 	}
 }
