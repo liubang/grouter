@@ -1,7 +1,6 @@
 package grouter
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
@@ -9,9 +8,7 @@ import (
 )
 
 func TestRouter_Lookup(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	router := NewRouter(ctx)
+	router := NewRouter()
 	router.Get("/aaa/@name:([a-z]+)/@age:([0-9]+)", nil)
 	router.Put("/bbb/@age:([0-9]+)", nil)
 	router.Get("/ccc/@name:([a-z]+)/@age:([0-9]+)", nil)

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/iliubang/grouter"
+	"github.com/liubang/grouter"
 )
 
 func foo(_ context.Context, w http.ResponseWriter, _ *http.Request, _ map[string]string) {
@@ -17,9 +17,7 @@ func bar(_ context.Context, w http.ResponseWriter, _ *http.Request, params map[s
 }
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	r := grouter.NewRouter(ctx)
+	r := grouter.NewRouter()
 	r.Get("/index.html", foo)
 	r.Get("/aaa/@name:([^/]+)", bar)
 	http.ListenAndServe("127.0.0.1:8080", r)

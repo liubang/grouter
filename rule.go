@@ -1,18 +1,19 @@
 package grouter
 
 import (
+	"log"
 	"regexp"
 	"strings"
 )
 
 type Rule struct {
+	matcher   *regexp.Regexp
+	Params    map[string]string
+	Handler   HandlerFunc
 	Method    string
 	Path      string
 	Reg       string
-	matcher   *regexp.Regexp
-	Params    map[string]string
 	ParamKeys []string
-	Handler   HandlerFunc
 }
 
 var (
@@ -43,7 +44,7 @@ var (
 func NewRule(method string, path string, handler HandlerFunc) *Rule {
 	method = strings.ToUpper(method)
 	if !HTTPMETHOD[method] {
-		panic("invalid request method " + method)
+		log.Panic("invalid request method " + method)
 	}
 	rule := &Rule{
 		Method:  method,

@@ -1,0 +1,44 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+#======================================================================
+#
+# BUILD.bazel -
+#
+# Created by liubang on 2023/05/19 21:57
+# Last Modified: 2023/05/19 21:57
+#
+#======================================================================
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+# gazelle:prefix github.com/liubang/grouter
+gazelle(name = "gazelle")
+
+gazelle(
+    name = "gazelle-update-repos",
+    args = [
+        "-from_file=go.mod",
+        "-to_macro=deps.bzl%go_dependencies",
+        "-prune",
+    ],
+    command = "update-repos",
+)
+
+go_library(
+    name = "grouter",
+    srcs = [
+        "router.go",
+        "rule.go",
+    ],
+    importpath = "github.com/liubang/grouter",
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "grouter_test",
+    srcs = [
+        "router_test.go",
+        "rule_test.go",
+    ],
+    embed = [":grouter"],
+    deps = ["@com_github_stretchr_testify//assert:go_default_library"],
+)

@@ -7,22 +7,19 @@ import (
 )
 
 type Router struct {
-	Rules    []*Rule
 	NotFound HandlerFunc
-	ctx      context.Context
+	Rules    []*Rule
 }
 
 type HandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, pathvariables map[string]string)
 
-var (
-	NotFound = func(_ context.Context, w http.ResponseWriter, r *http.Request, _ map[string]string) {
-		http.NotFound(w, r)
-	}
-)
+var NotFound = func(_ context.Context, w http.ResponseWriter, r *http.Request, _ map[string]string) {
+	http.NotFound(w, r)
+}
 
 // 创建一个Router
-func NewRouter(ctx context.Context) *Router {
-	return &Router{ctx: ctx}
+func NewRouter() *Router {
+	return &Router{}
 }
 
 func (router *Router) SetNotFound(notFoundHandler HandlerFunc) {
@@ -96,14 +93,13 @@ func (router *Router) Lookup(method string, uri string) (*Rule, bool) {
 
 // implements http.Handler interface.
 func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	rule, f := router.Lookup(r.Method, r.URL.Path)
-	if f {
-		rule.Handler(router.ctx, w, r, rule.Params)
+	if rule, f := router.Lookup(r.Method, r.URL.Path); f {
+		rule.Handler(r.Context(), w, r, rule.Params)
+		return
+	}
+	if router.NotFound != nil {
+		router.NotFound(r.Context(), w, r, nil)
 	} else {
-		if router.NotFound != nil {
-			router.NotFound(router.ctx, w, r, nil)
-		} else {
-			NotFound(router.ctx, w, r, nil)
-		}
+		NotFound(r.Context(), w, r, nil)
 	}
 }
