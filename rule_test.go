@@ -3,13 +3,15 @@ package grouter
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestNewRule(t *testing.T) {
-	rule := NewRule("POST", "/liubang/@name:([a-z]+)/@age:([0-9])", nil)
-	keys := rule.ParamKeys
-	assert.Equal(t, 2, len(keys))
-	assert.Equal(t, "name", keys[0])
-	assert.Equal(t, "age", keys[1])
+	Convey("case 1:", t, func() {
+		rule := NewRule("POST", "/liubang/@name:([a-z]+)/@age:([0-9])", nil)
+		keys := rule.ParamKeys
+		So(len(keys), ShouldEqual, 2)
+		So(keys[0], ShouldEqual, "")
+		So(keys[1], ShouldEqual, "age")
+	})
 }

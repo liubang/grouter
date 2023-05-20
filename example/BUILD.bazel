@@ -8,16 +8,16 @@
 #======================================================================
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 
+go_binary(
+    name = "example",
+    embed = [":example_lib"],
+    visibility = ["//visibility:public"],
+)
+
 go_library(
     name = "example_lib",
     srcs = ["server.go"],
     importpath = "github.com/liubang/grouter/example",
     visibility = ["//visibility:private"],
-    deps = ["@com_github_liubang_grouter//:go_default_library"],
-)
-
-go_binary(
-    name = "example",
-    embed = [":example_lib"],
-    visibility = ["//visibility:public"],
+    deps = ["//:grouter"],
 )

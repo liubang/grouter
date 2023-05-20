@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/liubang/grouter"
@@ -20,5 +21,6 @@ func main() {
 	r := grouter.NewRouter()
 	r.Get("/index.html", foo)
 	r.Get("/aaa/@name:([^/]+)", bar)
+	log.Println("server listening on 127.0.0.1:8080...")
 	http.ListenAndServe("127.0.0.1:8080", r)
 }
